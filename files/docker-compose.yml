@@ -1,0 +1,68 @@
+version: '3.3'
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce
+    restart: always
+    ports:
+      - "9000:9000/tcp"
+    environment:
+      - TZ=Europe/Rome
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/pi/docker_files/portainer/data:/data
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - /home/pi/docker_files/homeassistant/config:/config
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
+    privileged: true
+    network_mode: host
+    environment:
+      - TZ=Europe/Rome
+    # devices:
+    #   - /dev/ttyACM0:/dev/ttyACM0
+    depends_on:
+     - mosquitto
+     - postgres
+     - zigbee2mqtt
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: unless-stopped
+    volumes:
+      - /home/pi/docker_files/postgres/data:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - POSTGRES_USER=ha
+      - POSTGRES_PASSWORD=ha
+      - POSTGRES_DB=ha
+    ports:
+      - 5432:5432
+  mosquitto:
+      image: eclipse-mosquitto:2.0
+      restart: unless-stopped
+      container_name: mosquitto
+      volumes:
+        - /home/pi/docker_files/mosquitto/data:/mosquitto/data
+        - /home/pi/docker_files/mosquitto/config:/mosquitto/config
+        - /home/pi/docker_files/mosquitto/log:/mosquitto/log
+      ports:
+        - "1883:1883"
+        - "9001:9001"
+      network_mode: host
+  zigbee2mqtt:
+    container_name: zigbee2mqtt
+    restart: unless-stopped
+    image: koenkk/zigbee2mqtt
+    volumes:
+      - /home/pi/docker_files/zigbee2mqtt/data:/app/data
+      - /run/udev:/run/udev:ro
+    ports:
+      - 8080:8080
+    environment:
+      - TZ=Europe/Rome
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0

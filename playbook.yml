@@ -1,0 +1,76 @@
+---
+- name: Install Docker and Docker Compose
+  hosts: servers
+  become: yes
+  gather_facts: yes
+  vars:
+    basePath: /home/youruser/ansible/
+    dockerCompose: docker-compose.yml
+    targetUser: youruser
+
+  tasks:
+    - name: Facts variables to show target OS and IP
+      debug:
+        msg: "OS: {{ ansible_distribution }}, IP: {{ ansible_default_ipv4.address }}"
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade packages
+      apt:
+        upgrade: dist
+
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker APT repository
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Add user to the docker group
+      user:
+        name: "{{targetUser}}"
+        groups: docker
+        append: yes
+
+    - name: Create target directory if it does not exist
+      file:
+        path: "{{ basePath }}"
+        state: directory
+        mode: 0755
+
+    - name: copy Docker Compose files
+      copy:
+        src: "{{ playbook_dir }}/files/{{ item }}"
+        dest: "{{basePath}}{{ item }}"
+      loop:
+        - "{{dockerCompose}}"
+
+    - name: deploy Docker Compose stack
+      community.docker.docker_compose:
+        project_src: "{{basePath}}"
+        files:
+          - "{{dockerCompose}}"
+
