@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Network Interface Name
-interface="eth0"
+interface="eth0" #change me
 
 # Static IP Address
-ip_address="192.168.1.2"
+ip_address="192.168.1.2" # example remote host
 netmask="24"
-gateway="192.168.1.1"
+gateway="192.168.1.1" # example remote gateway
 dns_server="8.8.8.8"
 
 # Network interface configuration

@@ -11,7 +11,7 @@ KerberosAuthentication no
 GSSAPIAuthentication no
 UsePAM yes
 AllowAgentForwarding no
-AllowTcpForwarding no
+AllowTcpForwarding yes
 X11Forwarding no
 PermitUserEnvironment no
 AcceptEnv LANG LC_*

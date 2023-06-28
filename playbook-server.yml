@@ -1,12 +1,11 @@
+# this playbook is for setting up Raspberry marco
 ---
-- name: Install Docker and Docker Compose
+- name: Install Docker DockerCompose Plex
   hosts: servers
   become: yes
   gather_facts: yes
-  vars:
-    basePath: /home/youruser/ansible/
-    dockerCompose: docker-compose.yml
-    targetUser: youruser
+  vars_files:
+    - vars/server.yml
 
   tasks:
     - name: Facts variables to show target OS and IP
@@ -36,7 +35,7 @@
 
     - name: Add Docker APT repository
       apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+        repo: "deb [arch=armhf] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
         state: present
 
     - name: Install Docker
@@ -74,3 +73,28 @@
         files:
           - "{{dockerCompose}}"
 
+    # Plex
+    - name: Configure Plex repository
+      apt_repository:
+        repo: "{{ plex_repo_url }}"
+        state: present
+        update_cache: false
+      register: status_plex_repo
+
+    - name: Add Plex repository key
+      apt_key:
+        url: "{{ plex_repo_key }}"
+        state: present
+      register: status_plex_repo
+
+    - name: Install Plex Server
+      apt:
+        name: plexmediaserver
+        state: present
+        update_cache: "{{ status_plex_repo.changed }}"
+
+    - name: Start and enable Plex service
+      service:
+        name: plexmediaserver
+        state: started
+        enabled: true

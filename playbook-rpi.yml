@@ -1,0 +1,92 @@
+# this playbook is for setting up Raspberry Pi
+---
+- name: Install Docker and Docker Compose
+  hosts: servers
+  become: yes
+  gather_facts: yes
+  vars_files:
+  - vars/rpi.yml
+
+  tasks:
+    - name: Facts variables to show target OS and IP
+      debug:
+        msg: "OS: {{ ansible_distribution }}, IP: {{ ansible_default_ipv4.address }}"
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade packages
+      apt:
+        upgrade: dist
+
+    - name: Install required packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - software-properties-common
+
+    - name: Remove python-configparser package
+      apt:
+        name: python-configparser
+        state: absent
+
+    - name: get docker convenience script
+      shell: curl -fsSL https://get.docker.com -o get-docker.sh
+      args:
+        creates: /home/{{targetUser}}/get-docker.sh
+
+    - name: install docker
+      shell: sh /home/{{targetUser}}/get-docker.sh
+      args:
+        creates: /usr/bin/docker
+
+    - name: make pi user execute docker commands
+      shell: usermod -aG docker {{targetUser}}
+
+    - name: Install Docker Compose
+      apt:
+        name: docker-compose
+        state: present
+
+    - name: Create target directory if it does not exist
+      file:
+        path: "{{ basePath }}"
+        state: directory
+        mode: 0755
+
+    - name: Copy Docker Compose files
+      copy:
+        src: "{{ playbook_dir }}/files/{{ item }}"
+        dest: "{{basePath}}{{ item }}"
+      loop:
+        - "{{dockerCompose}}"
+
+    - name: Deploy Docker Compose stack
+      community.docker.docker_compose:
+        project_src: "{{basePath}}"
+        files:
+          - "{{dockerCompose}}"
+
+    - name: Copy Mosquitto config files
+      copy:
+        src: "{{ playbook_dir }}/files/mosquitto/{{ item }}"
+        dest: "{{dockerPath}}/mosquitto/config/"
+      loop:
+        - "mosquitto.conf"
+        - "mosquitto.passwd"
+
+    - name: Copy Zigbee2Mqtt config files
+      copy:
+        src: "{{ playbook_dir }}/files/zigbee2mqtt/{{ item }}"
+        dest: "{{dockerPath}}/zigbee2mqtt/data/"
+      loop:
+        - "configuration.yaml"
+
+    - name: Riavvia i servizi Docker Compose
+      command: "docker-compose -f {{dockerCompose}} restart"
+      args:
+        chdir: "{{basePath}}"

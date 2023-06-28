@@ -1,0 +1,5 @@
+basePath: /home/pi/ansible/
+dockerPath: /home/pi/docker_files
+targetUser: pi
+dockerCompose: docker-compose-rpi.yml
+osDistributionRelease: bullseye
