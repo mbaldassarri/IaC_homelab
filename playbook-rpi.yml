@@ -5,7 +5,7 @@
   become: yes
   gather_facts: yes
   vars_files:
-  - vars/rpi.yml
+    - vars/rpi.yml
 
   tasks:
     - name: Facts variables to show target OS and IP
@@ -34,17 +34,17 @@
         name: python-configparser
         state: absent
 
-    - name: get docker convenience script
+    - name: Get docker convenience script
       shell: curl -fsSL https://get.docker.com -o get-docker.sh
       args:
         creates: /home/{{targetUser}}/get-docker.sh
 
-    - name: install docker
+    - name: Install docker
       shell: sh /home/{{targetUser}}/get-docker.sh
       args:
         creates: /usr/bin/docker
 
-    - name: make pi user execute docker commands
+    - name: Make pi user execute docker commands
       shell: usermod -aG docker {{targetUser}}
 
     - name: Install Docker Compose
@@ -79,6 +79,21 @@
         - "mosquitto.conf"
         - "mosquitto.passwd"
 
+    - name: Copy Turn On NAS project
+      copy:
+        src: "{{ playbook_dir }}/files/turn-on-nas/"
+        dest: "{{dockerPath}}/turn-on-nas/"
+        directory_mode:
+      tags:
+        - parentdir
+
+    - name: Build Turn On Nas Dockerfile
+      docker_image:
+        name: turn-on-nas
+        source: build
+        build:       
+          path: "{{dockerPath}}/turn-on-nas/"
+
     - name: Copy Zigbee2Mqtt config files
       copy:
         src: "{{ playbook_dir }}/files/zigbee2mqtt/{{ item }}"
@@ -86,7 +101,18 @@
       loop:
         - "configuration.yaml"
 
-    - name: Riavvia i servizi Docker Compose
+    - name: Restart Docker Compose services
       command: "docker-compose -f {{dockerCompose}} restart"
       args:
         chdir: "{{basePath}}"
+
+    - name: Run Turn On Nas Docker container
+      community.general.docker_container:
+        name: turn-on-nas
+        image: turn-on-nas
+        ports:
+          - "3030:3030"
+          - "9:9/udp"
+          - "2435:2435/tcp"
+        network_mode: host
+        restart: true

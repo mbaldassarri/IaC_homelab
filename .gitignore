@@ -1,2 +1,4 @@
 *.retry
 *.passwd
+id_rsa
+
