@@ -27,7 +27,6 @@ The playbook is mostly being developed for personal use and for nerdy home proje
 - [DuckDNS](https://hub.docker.com/r/linuxserver/duckdns)
 - [Transmission](https://hub.docker.com/r/linuxserver/transmission)
 - [Plex](https://www.plex.tv/)
-- Dockerized script to turn the NAS ON and OFF
 
 ## Bash scripts
 
@@ -69,6 +68,7 @@ An example of the docker run script and links to the repo to get the latest firm
 There are two Playbooks, one is for Raspberry Pi services, the other one is for Plex services. Playbooks have been split in two parts in order to run media services in a different (maybe more powerful) home server and let the Raspberry Pi handle the other services.
 
 Here is an example on how to run Raspberry Pi Ansible Playbook:
+
 ```
 ansible-playbook -i hosts.ini playbook-rpi.yml
 ```
@@ -82,24 +82,5 @@ Note: in order to secure up MQTT instance, it is recommended to create a hashed 
 ```
 mosquitto_passwd -c <password file> <username>
 ```
-
-## Turn on NAS
-
-The script exposes two APIs: turnon and turnoff.
-The script sources (as well as the "id_rsa" private key to access the NAS server) will be copied over. Do not forget to copy your "id_rsa" key on the following path:
-
-```
-files/turn-on-nas/routes/
-```
-
-Ansible will take care of building the image (based on the Dockerfile provided) and run it.
-As well as the other services, also the "turn-on-nas" should show up on the containers list.
-With these APIs exposed, you can choose the client that best fits your needs.
-Examples:
-
-- Integrate the turn on / turn off trigger with Home Assistant Button
-- Create an IFTTT Applet and integrate it with Alexa routines.
-
-Both the tasks are easy to get up and running. Just do not forget to create a NAT rule on your firewall and take advantage of DuckDNS container to have updated IP of your homelab.
 
 _Enjoy! :)_

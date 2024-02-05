@@ -79,21 +79,6 @@
         - "mosquitto.conf"
         - "mosquitto.passwd"
 
-    - name: Copy Turn On NAS project
-      copy:
-        src: "{{ playbook_dir }}/files/turn-on-nas/"
-        dest: "{{dockerPath}}/turn-on-nas/"
-        directory_mode:
-      tags:
-        - parentdir
-
-    - name: Build Turn On Nas Dockerfile
-      docker_image:
-        name: turn-on-nas
-        source: build
-        build:       
-          path: "{{dockerPath}}/turn-on-nas/"
-
     - name: Copy Zigbee2Mqtt config files
       copy:
         src: "{{ playbook_dir }}/files/zigbee2mqtt/{{ item }}"
@@ -105,14 +90,3 @@
       command: "docker-compose -f {{dockerCompose}} restart"
       args:
         chdir: "{{basePath}}"
-
-    - name: Run Turn On Nas Docker container
-      community.general.docker_container:
-        name: turn-on-nas
-        image: turn-on-nas
-        ports:
-          - "3030:3030"
-          - "9:9/udp"
-          - "2435:2435/tcp"
-        network_mode: host
-        restart: true
