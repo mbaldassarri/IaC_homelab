@@ -4,9 +4,9 @@
 interface="eth0" #change me
 
 # Static IP Address
-ip_address="192.168.1.2" # example remote host
+ip_address="192.168.10.110"
 netmask="24"
-gateway="192.168.1.1" # example remote gateway
+gateway="192.168.10.253" #change me
 dns_server="8.8.8.8"
 
 # Network interface configuration

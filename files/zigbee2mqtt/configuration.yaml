@@ -3,8 +3,8 @@ permit_join: true
 mqtt:
   base_topic: zigbee2mqtt
   server: mqtt://mosquitto
-  user: 'yourusername'
-  password: 'yourpassword'
+  user: 'panda'
+  password: 'lightweightcommunication'
   client_id: 'zigbee2mqtt'
   include_device_information: true
 frontend:

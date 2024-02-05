@@ -1,7 +1,7 @@
 #!/bin/bash
 
 remote_user="pi" # example remote user
-remote_host="192.168.1.2" # example remote host
+remote_host="192.168.10.178" # example remote host
 rsa_key_path="$(realpath ~/.ssh/id_rsa.pub)"
 sshd_config_path="/etc/ssh"
 remote_home_dir="/home/$remote_user"

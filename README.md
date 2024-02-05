@@ -84,8 +84,8 @@ mosquitto_passwd -c <password file> <username>
 ```
 
 ## Turn on NAS
-This script is responsible for turning on and off your remote NAS server (maybe within your local network). 
-It is a pretty simple script that exposes two RESTFull APIs: /turnon and /turnoff.
+
+The script exposes two APIs: turnon and turnoff.
 The script sources (as well as the "id_rsa" private key to access the NAS server) will be copied over. Do not forget to copy your "id_rsa" key on the following path:
 
 ```

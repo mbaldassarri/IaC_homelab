@@ -1,4 +1,4 @@
-version: '3.3'
+version: "3.3"
 services:
   portainer:
     container_name: portainer
@@ -32,10 +32,10 @@ services:
       - "53:53/udp"
       - "8085:80/tcp"
     environment:
-      TZ: 'Europe/Rome'
+      TZ: "Europe/Rome"
     volumes:
-      - './home/pi/docker_files/pihole/config:/etc/pihole'
-      - './home/pi/docker_files/pihole/dnsmasq.d:/etc/dnsmasq.d'
+      - "./home/pi/docker_files/pihole/config:/etc/pihole"
+      - "./home/pi/docker_files/pihole/dnsmasq.d:/etc/dnsmasq.d"
     restart: unless-stopped
   wireguard:
     image: linuxserver/wireguard
@@ -60,18 +60,18 @@ services:
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: always
-  duckdns: 
+  duckdns:
     image: lscr.io/linuxserver/duckdns:latest
     container_name: duckdns
     environment:
-      - PUID=1000 
-      - PGID=1000 
+      - PUID=1000
+      - PGID=1000
       - TZ=Europe/Rome
-      - SUBDOMAINS=grottazzolina
+      - SUBDOMAINS=homelab-an
       - TOKEN=b619cf6c-7af6-415c-a9dd-60fd0e890d87
-      - LOG_FILE=false 
+      - LOG_FILE=false
     volumes:
-      - /opt/duckdns/config:/config
+      - /home/pi/docker_files/duckdns/config:/config
     restart: always
   homeassistant:
     container_name: homeassistant
@@ -87,10 +87,10 @@ services:
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
     depends_on:
-     - mosquitto
-     - postgres
-     - zigbee2mqtt
-     - esphome
+      - mosquitto
+      - postgres
+      - zigbee2mqtt
+      - esphome
   postgres:
     image: postgres
     container_name: postgres
@@ -105,16 +105,16 @@ services:
     ports:
       - 5432:5432
   mosquitto:
-      image: eclipse-mosquitto:2.0
-      restart: always
-      container_name: mosquitto
-      volumes:
-        - /home/pi/docker_files/mosquitto/data:/mosquitto/data
-        - /home/pi/docker_files/mosquitto/config:/mosquitto/config
-        - /home/pi/docker_files/mosquitto/log:/mosquitto/log
-      ports:
-        - "1883:1883"
-        - "9001:9001"
+    image: eclipse-mosquitto:2.0
+    restart: always
+    container_name: mosquitto
+    volumes:
+      - /home/pi/docker_files/mosquitto/data:/mosquitto/data
+      - /home/pi/docker_files/mosquitto/config:/mosquitto/config
+      - /home/pi/docker_files/mosquitto/log:/mosquitto/log
+    ports:
+      - "1883:1883"
+      - "9001:9001"
   zigbee2mqtt:
     container_name: zigbee2mqtt
     restart: unless-stopped
@@ -129,7 +129,7 @@ services:
     devices:
       - /dev/ttyUSB0:/dev/ttyUSB0
     depends_on:
-     - mosquitto
+      - mosquitto
   esphome:
     container_name: esphome
     image: ghcr.io/esphome/esphome

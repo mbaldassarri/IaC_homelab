@@ -1,4 +1,4 @@
-version: '3.3'
+version: "3.3"
 services:
   portainer:
     container_name: portainer
@@ -11,3 +11,69 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/marco/docker_files/portainer/data:/data
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - WEBUI_PORT=8080
+    volumes:
+      - /home/marco/docker_files/qbittorrent/config:/config
+      - /home/marco/downloads:/downloads
+      - /home/marco/movies:/movies
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/marco/docker_files/radarr/config:/config
+      - /home/marco/movies:/movies
+      - /home/marco/downloads:/downloads
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+  overseerr:
+    image: lscr.io/linuxserver/overseerr:latest
+    container_name: overseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/marco/docker_files/overseer/config:/config
+    ports:
+      - 5055:5055
+    restart: unless-stopped
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - /home/marco/docker_files/prowlarr/config:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+
+    version: "3"
+  onedrive:
+    image: driveone/onedrive:edge
+    restart: unless-stopped
+    environment:
+      - ONEDRIVE_UID=1000
+      - ONEDRIVE_GID=1000
+    volumes:
+      - /home/marco/docker_files/onedrive:/onedrive/conf
+      - /media/Data/Cloud:/onedrive/data
