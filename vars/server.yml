@@ -8,3 +8,4 @@ plex_repo_key: "https://downloads.plex.tv/plex-keys/PlexSign.key"
 basePath: /home/marco/ansible/
 targetUser: marco
 dockerCompose: docker-compose-server.yml
+envFile: .env
